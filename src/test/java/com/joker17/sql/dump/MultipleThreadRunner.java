@@ -33,8 +33,11 @@ public class MultipleThreadRunner {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                runnable.run();
-                countDownLatch.countDown();
+                try {
+                    runnable.run();
+                } finally {
+                    countDownLatch.countDown();
+                }
             }
         }).start();
     }
