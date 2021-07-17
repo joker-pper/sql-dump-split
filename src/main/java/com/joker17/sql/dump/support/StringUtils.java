@@ -3,10 +3,14 @@ package com.joker17.sql.dump.support;
 public class StringUtils {
 
     public static boolean equals(CharSequence left, CharSequence right) {
-        if (left != null && left != null) {
-            return left.toString().equals(right.toString());
+        if (left == right) {
+            return true;
         } else {
-            return false;
+            if (left != null && left != null) {
+                return left.toString().equals(right.toString());
+            } else {
+                return false;
+            }
         }
     }
 

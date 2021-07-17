@@ -63,7 +63,7 @@ public class DumpSpiltHelper {
 
         int bufferSize = dumpParam.getBufferSize();
 
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(inPath), inCharset);
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(inFile), inCharset);
         BufferedReader bufferedReader;
         if (bufferSize > 0) {
             bufferedReader = new BufferedReader(reader, bufferSize);
@@ -91,10 +91,8 @@ public class DumpSpiltHelper {
 
             TableStructureModel tableStructureModel = null;
 
-            String line = null;
-            String temp;
-            while ((temp = bufferedReader.readLine()) != null) {
-                line = temp;
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
 
                 if (dbTag == DbTag.START) {
 
