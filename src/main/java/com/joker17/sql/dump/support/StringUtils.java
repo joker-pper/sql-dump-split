@@ -6,7 +6,7 @@ public class StringUtils {
         if (left == right) {
             return true;
         } else {
-            if (left != null && left != null) {
+            if (left != null && right != null) {
                 return left.toString().equals(right.toString());
             } else {
                 return false;
