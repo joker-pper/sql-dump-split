@@ -71,13 +71,45 @@ public class BaseWriteHandler implements WriteHandler {
         if (table == null || table.length() == 0) {
             return false;
         }
+        return isMatchResolveTableName(tables, table, exclude);
+    }
 
-        if (tables == null || tables.isEmpty()) {
+
+    /**
+     * 是否为匹配到要处理的表名
+     *
+     * @param filterTableNames 过滤的表名
+     * @param tableName        表名
+     * @param exclude          true: 排除, false: 包含
+     * @return
+     */
+    boolean isMatchResolveTableName(Collection<String> filterTableNames, String tableName, boolean exclude) {
+        if (filterTableNames == null || filterTableNames.isEmpty()) {
             return true;
         }
-
-        boolean contains = tables.contains(table);
+        boolean contains = isMatches(filterTableNames, tableName);
         return exclude ? !contains : contains;
+    }
+
+    /**
+     * 获取是否匹配到text
+     *
+     * @param filterTexts
+     * @param text
+     * @return
+     */
+    boolean isMatches(Collection<String> filterTexts, String text) {
+        if (filterTexts.contains(text)) {
+            //直接包含时
+            return true;
+        }
+        for (String filterText : filterTexts) {
+            if (text.matches(filterText)) {
+                //正则匹配时
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -164,7 +196,6 @@ public class BaseWriteHandler implements WriteHandler {
         int y = this.getOrder();
         return Integer.compare(x, y);
     }
-
 
 
 }

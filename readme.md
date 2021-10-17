@@ -22,8 +22,14 @@ java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../
 #导出user和sys_config
 java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../db/ds_export-dump-result(user-sys_config).sql" -table "user sys_config"
 
+#通过正则导出user和sys_config
+java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../db/ds_export-dump-result(regex).sql" -table "user|sys_config"
+
 #排除导出user
-java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../db/ds_export-dump-result(-exclude-user).sql" -table user -exclude
+java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../db/ds_export-dump-result(exclude-user).sql" -table user -exclude
+
+#通过正则排除导出sys开头的以及user
+java -jar sql-dump-split-1.0-SNAPSHOT.jar -in ../db/ds_export-dump.sql -out "../db/ds_export-dump-result(exclude-regex).sql" -table "sys.*|user" -exclude
 
 ``` 
 
