@@ -7,17 +7,20 @@ public class TableStructureUtils {
 
     /**
      * 获取是否为table structure语句
+     *
      * @param text
      * @return
      */
     public static boolean isMatch(String text) {
-
         WriteHandler writeHandler = WriteHandlerHolder.getWriteHandler();
         if (writeHandler != null) {
+            //当前线程存在writeHandler时
             return writeHandler.isMatchTableStructure(text);
         }
 
-        boolean[] results = new boolean[] {false};
+        //通过遍历所有的WriteHandler进行获取是否匹配结果
+
+        boolean[] results = new boolean[]{false};
 
         WriteHandlerFactory.doWithWriteHandler(new WriteHandlerFactory.LoopCallback() {
 
@@ -38,17 +41,19 @@ public class TableStructureUtils {
 
     /**
      * 获取table name
+     *
      * @param text
      * @return
      */
     public static String getTable(String text) {
-
         WriteHandler writeHandler = WriteHandlerHolder.getWriteHandler();
         if (writeHandler != null) {
+            //当前线程存在writeHandler时
             return writeHandler.getTableName(text);
         }
 
-        String[] results = new String[] {null};
+        //通过遍历所有的WriteHandler进行获取结果
+        String[] results = new String[]{null};
 
         WriteHandlerFactory.doWithWriteHandler(new WriteHandlerFactory.LoopCallback() {
 

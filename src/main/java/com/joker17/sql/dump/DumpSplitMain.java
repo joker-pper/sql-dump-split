@@ -24,7 +24,7 @@ public class DumpSplitMain {
 
 
         if (args.length == 0) {
-            args = new String[] {"--help"};
+            args = new String[]{"--help"};
         }
 
         DumpParam dumpParam = new DumpParam();

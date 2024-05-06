@@ -2,12 +2,24 @@ package com.joker17.sql.dump.model;
 
 public class TableStructureModel {
 
+    /**
+     * 前缀
+     */
     private String textPrefix;
 
+    /**
+     * 总行数
+     */
     private int total;
 
+    /**
+     * value值所处行索引值
+     */
     private int valueIndex;
 
+    /**
+     * 结束线在前缀下的距离行数
+     */
     private int endLine;
 
     public TableStructureModel(String textPrefix, int total, int valueIndex, int endLine) {

@@ -14,10 +14,18 @@ public class WriteHandlerFactory {
 
     }
 
+     /**
+     * 注册writeHandler
+     *
+     * @param writeHandler
+     */
     public static void registerWriteHandler(WriteHandler writeHandler) {
         WRITE_HANDLER_CACHE.add(writeHandler);
     }
 
+    /**
+     * 注册完成
+     */
     public static void registerWriteHandlerComplete() {
         Collections.sort(WRITE_HANDLER_CACHE);
     }
@@ -35,6 +43,11 @@ public class WriteHandlerFactory {
         return null;
     }
 
+    /**
+     * 遍历所有的WriteHandler进行执行callback逻辑
+     *
+     * @param callback
+     */
     public static void doWithWriteHandler(LoopCallback callback) {
         if (callback == null) {
             return;
@@ -48,9 +61,19 @@ public class WriteHandlerFactory {
     }
 
     public interface LoopCallback {
-
+        /**
+         * 执行
+         *
+         * @param writeHandler
+         */
         void execute(WriteHandler writeHandler);
 
+        /**
+         * 是否停止
+         *
+         * @param writeHandler
+         * @return
+         */
         boolean isBreak(WriteHandler writeHandler);
     }
 }

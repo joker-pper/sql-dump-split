@@ -3,7 +3,7 @@ package com.joker17.sql.dump.core.hanlder.impl;
 import com.joker17.sql.dump.core.hanlder.WriteHandler;
 import com.joker17.sql.dump.model.TableStructureModel;
 import com.joker17.sql.dump.support.StringUtils;
-import com.joker17.sql.dump.support.WriteHandlerHolder;
+import com.joker17.sql.dump.support.WriterHolder;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -125,13 +125,13 @@ public class BaseWriteHandler implements WriteHandler {
 
     @Override
     public void initCurrentWriter(String outPath, Charset charset) throws IOException {
-        if (WriteHandlerHolder.getWriter() != null) {
+        if (WriterHolder.getWriter() != null) {
             //已初始化
             return;
         }
         File outFile = new File(outPath);
         outFile.getParentFile().mkdirs();
-        WriteHandlerHolder.setWriter(getWriter(outFile, charset));
+        WriterHolder.setWriter(getWriter(outFile, charset));
     }
 
     @Override
@@ -152,7 +152,7 @@ public class BaseWriteHandler implements WriteHandler {
 
     @Override
     public void write(String content, Charset inCharset, Charset outCharset) {
-        Writer writer = WriteHandlerHolder.getWriter();
+        Writer writer = WriterHolder.getWriter();
         if (writer != null) {
             try {
                 writer.write(content + "\r\n");
@@ -164,7 +164,7 @@ public class BaseWriteHandler implements WriteHandler {
 
     @Override
     public void writeFinish() {
-        Writer writer = WriteHandlerHolder.getWriter();
+        Writer writer = WriterHolder.getWriter();
         if (writer != null) {
             try {
                 writer.flush();
