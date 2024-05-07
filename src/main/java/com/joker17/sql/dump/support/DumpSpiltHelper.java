@@ -49,6 +49,8 @@ public class DumpSpiltHelper {
                 WriteHandlerFactory.registerWriteHandler(writeHandler);
             }
         }
+
+        //标记注册完成
         WriteHandlerFactory.registerWriteHandlerComplete();
     }
 
@@ -93,10 +95,11 @@ public class DumpSpiltHelper {
 
         WriteHandler currentWriteHandler = WriteHandlerFactory.getDefaultWriteHandler();
 
-        List<String> startContents = new ArrayList<>(16);
+        List<String> startContents = new ArrayList<>(32);
 
         List<String> endContents = new ArrayList<>(16);
 
+        //可能为table标签的buffer列表
         List<String> bufferLineList = new ArrayList<>(16);
 
         try {
@@ -141,89 +144,102 @@ public class DumpSpiltHelper {
 
 
                     if (startHasFindTable && startHasFindTableEndLine-- == 0) {
-                        //处理开始内容
+                        //达到结束线在前缀下的距离行数时,处理开始内容
                         int size = startContents.size();
 
-                        List<String> firstTableStructureContents = new ArrayList<>(8);
+                        //将第一张表的table structure contents取出,并从startContents中移除
+                        List<String> firstTableStructureContents = new ArrayList<>(tableStructureModel.getTotal());
                         for (int i = 0; i < tableStructureModel.getTotal(); i++) {
                             firstTableStructureContents.add(0, startContents.remove(size - i - 1));
                         }
 
-                        //输出开始内容
+                        //输出前面部分的开始内容
                         currentWriteHandler.write(startContents, inCharset, outCharset);
 
                         String tableStructureText = firstTableStructureContents.get(tableStructureModel.getValueIndex());
 
-                        //判断是否匹配到对应的表
+                        //判断是否匹配到对应的表(匹配时才输出table structure多行内容)
                         boolean isMatchTable = currentWriteHandler.isMatchTable(tables, TableStructureUtils.getTable(tableStructureText), excludeMode);
 
                         if (isMatchTable) {
+                            //设置为MATCH_TABLE,并输出table structure多行内容
                             currentDbTag = DbTag.MATCH_TABLE;
                             currentWriteHandler.writeTableStructure(firstTableStructureContents, inCharset, outCharset);
                         } else {
                             currentDbTag = DbTag.NOT_MATCH_TABLE;
                         }
+
+                        //后续不再使用进行清除
+                        firstTableStructureContents.clear();
                     }
 
                 } else if (currentDbTag == DbTag.MATCH_TABLE) {
                     //匹配table时
 
                     if (currentWriteHandler.isEndTag(line)) {
+                        //判断是否进入结束标记
                         currentDbTag = DbTag.END;
                         endContents.add(line);
                     } else {
                         if (currentWriteHandler.isPossibleTableTag(line)) {
+                            //添加可能的table标签到buffer中
                             bufferLineList.add(line);
                         }
 
                         if (bufferLineList.isEmpty()) {
-                            //输出内容
+                            //输出对应内容 (ddl/dml等中间文本内容)
                             currentWriteHandler.write(line, inCharset, outCharset);
                         } else {
 
                             if (bufferLineList.size() == tableStructureModel.getTotal()) {
+                                //达到table标签内容可进行输出时
                                 String tableStructureText = bufferLineList.get(tableStructureModel.getValueIndex());
-
                                 if (TableStructureUtils.isMatch(tableStructureText)) {
+                                    //判断当前收集的数据是否匹配到对应的表
                                     boolean isMatchTable = currentWriteHandler.isMatchTable(tables, TableStructureUtils.getTable(tableStructureText), excludeMode);
                                     if (isMatchTable) {
+                                        //设置为MATCH_TABLE,并输出table structure多行内容
                                         currentDbTag = DbTag.MATCH_TABLE;
                                         currentWriteHandler.writeTableStructure(bufferLineList, inCharset, outCharset);
                                     } else {
                                         currentDbTag = DbTag.NOT_MATCH_TABLE;
                                     }
                                 } else {
-                                    //直接输出内容
+                                    //直接输出table标签内容 （e.g: -- Records of xxx）
                                     currentWriteHandler.write(bufferLineList, inCharset, outCharset);
                                 }
-                                //清空buffer
+                                //清空当前的buffer
                                 bufferLineList.clear();
                             }
                         }
                     }
 
                 } else if (currentDbTag == DbTag.NOT_MATCH_TABLE) {
+                    //不匹配的table时
 
                     if (currentWriteHandler.isEndTag(line)) {
+                        //判断是否进入结束标记
                         currentDbTag = DbTag.END;
                         endContents.add(line);
                     } else {
                         if (currentWriteHandler.isPossibleTableTag(line)) {
+                            //添加可能的table标签到buffer中
                             bufferLineList.add(line);
                         }
 
                         if (bufferLineList.size() == tableStructureModel.getTotal()) {
+                            //达到table标签内容可进行输出时
                             String tableStructureText = bufferLineList.get(tableStructureModel.getValueIndex());
                             if (TableStructureUtils.isMatch(tableStructureText)) {
+                                //判断当前收集的数据是否匹配到对应的表
                                 boolean isMatchTable = currentWriteHandler.isMatchTable(tables, TableStructureUtils.getTable(tableStructureText), excludeMode);
                                 if (isMatchTable) {
+                                    //设置为MATCH_TABLE,并输出table structure多行内容
                                     currentDbTag = DbTag.MATCH_TABLE;
                                     currentWriteHandler.writeTableStructure(bufferLineList, inCharset, outCharset);
-                                } else {
-                                    currentDbTag = DbTag.NOT_MATCH_TABLE;
                                 }
                             }
-                            //清空buffer
+                            //清空当前的buffer
                             bufferLineList.clear();
                         }
                     }
@@ -267,6 +283,5 @@ public class DumpSpiltHelper {
 
         }
     }
-
 
 }
